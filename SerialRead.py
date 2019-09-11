@@ -7,6 +7,7 @@ connected = False
 
 Y = [0] * 2000
 X = list(range(0,2000))
+it = 0;
 
 plt.ion()
 graph = plt.plot(X,Y)[0]
@@ -32,27 +33,31 @@ with open(fileName, mode='wb') as data_file:
         if connected:
             try:
                 
+                it = (it+1)%8
                 bytedata = bteLink.read_until()
-                strdata = bytedata.decode("utf-8")
-                comma2 = strdata.find(',',7)
-                comma3 = strdata.find(',',comma2 +1)
+                data_file.write(bytedata)
+
                 
-                try:
-                    load = float(strdata[comma2+1:comma3])
-                
-                    Y.append(load)
-                    Y.pop(0)
+                if (it == 0):
+                    strdata = bytedata.decode("utf-8")
+                    comma2 = strdata.find(',',7)
+                    comma3 = strdata.find(',',comma2 +1)
                     
-                    graph.set_ydata(Y)
-                    plt.draw()
-                    plt.pause(0.01)
+                    try:
+                        load = float(strdata[comma2+1:comma3])
                     
-                    data_file.write(bytedata)
-                    print(strdata)
-                    
-                except ValueError:
-                    print("Lost Connection")
-                    connected = False
+                        Y.append(load)
+                        Y.pop(0)
+                        
+                        graph.set_ydata(Y)
+                        plt.draw()
+                        plt.pause(0.01)
+                        
+                        #print(strdata)
+                        
+                    except ValueError:
+                        print("Lost Connection")
+                        connected = False
             except KeyboardInterrupt:
                 print('Finished Recording')  
                 data_file.close()   
